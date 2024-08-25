@@ -11,7 +11,7 @@ export const billetes = [
 ];
 
 export function mostrarMatriz(cantidad) {
-  if (cantidad <= 0 || cantidad % 10 !== 0) {
+  if (cantidad <= 0 || cantidad % 10000 !== 0) {
     console.error('La cantidad debe ser un múltiplo de 10 y positivo');
     return [];
   }
