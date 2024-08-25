@@ -1,7 +1,9 @@
 import Image from 'next/image';
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function ResultadoModal({ isOpen, onClose, billetesEntregados, matriz }) {
+  const [showDetails, setShowDetails] = useState(false);
+
   if (!isOpen) return null;
 
   // Contar la cantidad de cada billete
@@ -15,8 +17,8 @@ export default function ResultadoModal({ isOpen, onClose, billetesEntregados, ma
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000080]">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-3xl w-full max-h-[80vh] overflow-auto relative">
-        <button onClick={onClose} className="absolute top-2 right-2 text-gray-500 text-2xl">
+      <div className="bg-gray-900 text-white p-8 rounded-lg shadow-lg max-w-3xl w-full max-h-[80vh] overflow-auto relative">
+        <button onClick={onClose} className="absolute top-2 right-2 text-gray-400 text-2xl">
           ×
         </button>
         <h3 className="text-2xl font-semibold mb-6">Resultados del Retiro</h3>
@@ -25,30 +27,48 @@ export default function ResultadoModal({ isOpen, onClose, billetesEntregados, ma
           <ul className="flex flex-wrap gap-4 overflow-auto max-h-64">
             {billetesEntregados.map((billete, index) => (
               <li key={index} className="flex flex-col items-center">
-                <Image src={billete.img} className="w-52 h-auto" />
+                <Image src={billete.img} className="w-52 h-auto" alt={`Billete de ${billete.billete}`} />
                 <span>{billete.billete}</span>
               </li>
             ))}
           </ul>
-          <h4 className="text-xl font-medium mt-8 text-black">Cantidad de cada billete:</h4>
-          <div className="mt-4">
-            {Object.entries(cantidadBilletes).map(([billete, cantidad]) => (
-              <div key={billete} className="text-lg font-medium text-black">
-                {billete}: {cantidad}
-              </div>
-            ))}
+
+          <div className="flex items-center justify-between mt-8">
+            <div>
+              <h4 className="text-xl font-medium">Total entregado:</h4>
+              <div className="text-lg font-mono">${totalEntregado.toLocaleString()}</div>
+            </div>
+            <button
+              onClick={() => setShowDetails(!showDetails)}
+              className="p-2 bg-blue-500 text-white rounded"
+            >
+              {showDetails ? 'Ocultar detalles' : 'Más detalles'}
+            </button>
           </div>
-          <h4 className="text-xl font-medium mt-8 text-black">Matriz:</h4>
-          <div className="mt-4">
-            <div className="font-medium text-black">10k  20k   50k   100k</div>
-            {matriz.map((fila, index) => (
-              <div key={index} className="text-lg font-mono text-black">
-                {fila.map((n) => n.toString()).join(' | ')}
+
+          {showDetails && (
+            <div className="mt-4 grid grid-cols-2 gap-4">
+              <div>
+                <h4 className="text-xl font-medium">Cantidad de cada billete:</h4>
+                {Object.entries(cantidadBilletes).map(([billete, cantidad]) => (
+                  <div key={billete} className="text-lg font-medium">
+                    {billete}: {cantidad}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <h4 className="text-xl font-medium mt-8 text-black">Total entregado:</h4>
-          <div className="text-lg font-mono text-black">${totalEntregado.toLocaleString()}</div>
+              <div>
+                <h4 className="text-xl font-medium">Matriz:</h4>
+                <div className="mt-4">
+                  <div className="font-medium">10k  20k   50k   100k</div>
+                  {matriz.map((fila, index) => (
+                    <div key={index} className="text-lg font-mono">
+                      {fila.map((n) => n.toString()).join(' | ')}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

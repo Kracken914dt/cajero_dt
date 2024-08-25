@@ -16,6 +16,7 @@ export default function CajeroAutomatico() {
   const [billetesEntregados, setBilletesEntregados] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isWithdrawDisabled, setIsWithdrawDisabled] = useState(true); 
 
   const correctPassword = '1234';
 
@@ -44,6 +45,7 @@ export default function CajeroAutomatico() {
       setIsModalOpen(true);
     }
     setAmount('');
+    setIsWithdrawDisabled(true);
   };
 
   const handleDeposit = () => {
@@ -58,18 +60,28 @@ export default function CajeroAutomatico() {
     setMessage('');
   };
 
-  const validateAmount = (value) => {
-    if (value === '') {
-      setAmount('');
-      return;
+  const validateAmount = (e) => {
+    const value = e.target.value;
+    const regex = /^[1-9]\d*$/; // Solo permite números positivos
+
+    if (value === '' || !regex.test(value)) {
+        setAmount('');
+        setIsWithdrawDisabled(true);
+        setMessage('Introduce un valor numérico positivo');
+        return;
     }
 
-    // Verifica si el valor es un número positivo
     const number = Number(value);
-    if (Number.isInteger(number) && number > 0) {
-      setAmount(value);
+    if (number >= 10000 && number % 10000 === 0) {
+        setAmount(value);
+        setIsWithdrawDisabled(false);
+        setMessage('');
+    } else {
+        setAmount(value);
+        setIsWithdrawDisabled(true);
+        setMessage('La cantidad debe ser redondeada y de 10.000 para arriba');
     }
-  };
+};
 
   const validateUser = (e) => {
     const value = e.target.value.replace(/[^a-zA-Z]/g, ''); // Permite solo letras
@@ -115,12 +127,15 @@ export default function CajeroAutomatico() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2"
                 >
-                  {showPassword ? <EyeOff className="text-gray-400 mb-2" /> : <Eye className="text-gray-400 mb-2" />}
+                  {showPassword ? <EyeOff className="text-gray-400 mb-4" /> : <Eye className="text-gray-400 mb-4" />}
                 </button>
               </div>
               <button onClick={handleLogin} className="w-full p-2 bg-blue-500 text-white border-none rounded cursor-pointer">
                 Ingresar
               </button>
+              {message && (
+                <p className="text-red-500 mt-2">{message}</p>
+              )}
             </div>
           ) : (
             <div className="mt-4">
@@ -128,14 +143,17 @@ export default function CajeroAutomatico() {
               <label htmlFor="amount" className="block mb-2 text-gray-400">Cantidad</label>
               <input
                 id="amount"
-                type="number"
+                type="text" // Cambiado a 'text' para evitar la entrada de 'e'
                 value={amount}
-                onChange={(e) => validateAmount(e.target.value)}
+                onChange={validateAmount}
                 placeholder="Ingrese la cantidad"
                 className="w-full p-2 bg-gray-600 text-gray-100 border border-gray-600 rounded mb-4"
               />
+              {message && (
+                <p className="text-red-500 mt-2">{message}</p>
+              )}
               <div className="flex gap-2 mb-4">
-                <button onClick={handleWithdraw} className="flex-1 p-2 bg-red-500 text-white border-none rounded cursor-pointer">
+                <button onClick={handleWithdraw} className="flex-1 p-2 bg-red-500 text-white border-none rounded cursor-pointer" disabled={isWithdrawDisabled}>
                   Retirar
                 </button>
                 <button onClick={handleDeposit} className="flex-1 p-2 bg-green-500 text-white border-none rounded cursor-pointer">
@@ -148,11 +166,6 @@ export default function CajeroAutomatico() {
             </div>
           )}
         </div>
-        {isAuthenticated && (
-          <div className="mt-4 text-center text-gray-400">
-            <p>{message}</p>
-          </div>
-        )}
       </div>
       <ResultadoModal
         isOpen={isModalOpen}
