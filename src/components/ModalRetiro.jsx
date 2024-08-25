@@ -6,7 +6,7 @@ export default function ResultadoModal({ isOpen, onClose, billetesEntregados, ma
 
   if (!isOpen) return null;
 
-  // Contar la cantidad de cada billete
+
   const cantidadBilletes = billetesEntregados.reduce((acc, billete) => {
     acc[billete.billete] = (acc[billete.billete] || 0) + 1;
     return acc;
@@ -16,8 +16,8 @@ export default function ResultadoModal({ isOpen, onClose, billetesEntregados, ma
 
   const matrizModificada = (totalEntregado === 610000 || totalEntregado === 6100000)
   ? (totalEntregado === 6100000
-      ? matriz.filter((_, index) => (index + 1) % 5 !== 0) // Elimina cada quinta fila si es 6,100,000
-      : matriz.filter((_, index) => index !== 4) // Elimina la quinta fila si es 610,000
+      ? matriz.filter((_, index) => (index + 1) % 5 !== 0) 
+      : matriz.filter((_, index) => index !== 4) 
     )
   : matriz;
   

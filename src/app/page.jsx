@@ -65,7 +65,7 @@ export default function CajeroAutomatico() {
 
   const validateAmount = (e) => {
     const value = e.target.value;
-    const regex = /^[1-9]\d*$/; // Solo permite números positivos
+    const regex = /^[1-9]\d*$/; 
 
     if (value === '' || !regex.test(value)) {
         setAmount('');
@@ -87,12 +87,12 @@ export default function CajeroAutomatico() {
 };
 
   const validateUser = (e) => {
-    const value = e.target.value.replace(/[^a-zA-Z]/g, ''); // Permite solo letras
+    const value = e.target.value.replace(/[^a-zA-Z]/g, ''); 
     setUser(value);
   };
 
   const validatePassword = (e) => {
-    const value = e.target.value.replace(/[^0-9]/g, ''); // Permite solo números
+    const value = e.target.value.replace(/[^0-9]/g, ''); 
     setPassword(value);
   };
 
