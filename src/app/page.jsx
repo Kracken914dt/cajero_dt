@@ -161,7 +161,7 @@ export default function CajeroAutomatico() {
                   Retirar
                 </button>
                 <CajeroAudio play={playAudio} />
-                <button onClick={handleDeposit} className="flex-1 p-2 bg-green-600 text-white border-none rounded cursor-pointer hover:bg-green-700 hover:text-white transition-colors duration-300">
+                <button onClick={handleDeposit} className="flex-1 p-2 bg-green-600 text-white border-none rounded cursor-pointer hover:bg-green-800 hover:text-white transition-colors duration-300">
                   Abonar
                 </button>
               </div>
