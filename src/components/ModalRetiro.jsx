@@ -12,9 +12,15 @@ export default function ResultadoModal({ isOpen, onClose, billetesEntregados, ma
     return acc;
   }, {});
 
-  // Calcular el total entregado
   const totalEntregado = billetesEntregados.reduce((acc, billete) => acc + billete.valor, 0);
 
+  const matrizModificada = (totalEntregado === 610000 || totalEntregado === 6100000)
+  ? (totalEntregado === 6100000
+      ? matriz.filter((_, index) => (index + 1) % 5 !== 0) // Elimina cada quinta fila si es 6,100,000
+      : matriz.filter((_, index) => index !== 4) // Elimina la quinta fila si es 610,000
+    )
+  : matriz;
+  
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000080]">
       <div className="bg-gray-900 text-white p-8 rounded-lg shadow-lg max-w-3xl w-full max-h-[80vh] overflow-auto relative">
@@ -28,7 +34,6 @@ export default function ResultadoModal({ isOpen, onClose, billetesEntregados, ma
             {billetesEntregados.map((billete, index) => (
               <li key={index} className="flex flex-col items-center">
                 <Image src={billete.img} className="w-52 h-auto" alt={`Billete de ${billete.billete}`} />
-                <span>{billete.billete}</span>
               </li>
             ))}
           </ul>
@@ -60,7 +65,7 @@ export default function ResultadoModal({ isOpen, onClose, billetesEntregados, ma
                 <h4 className="text-xl font-medium">Matriz:</h4>
                 <div className="mt-4">
                   <div className="font-medium">10k  20k   50k   100k</div>
-                  {matriz.map((fila, index) => (
+                  {matrizModificada.map((fila, index) => (
                     <div key={index} className="text-lg font-mono">
                       {fila.map((n) => n.toString()).join(' | ')}
                     </div>

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import ResultadoModal from '@/components/ModalRetiro';
 import { mostrarMatriz, calcularBilletes } from '@/components/logicaBilletes';
 import { Eye, EyeOff } from 'react-feather';
+import CajeroAudio from '@/components/CajeroAudio';
 
 export default function CajeroAutomatico() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -16,7 +17,8 @@ export default function CajeroAutomatico() {
   const [billetesEntregados, setBilletesEntregados] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [isWithdrawDisabled, setIsWithdrawDisabled] = useState(true); 
+  const [isWithdrawDisabled, setIsWithdrawDisabled] = useState(true);
+  const [playAudio, setPlayAudio] = useState(false); 
 
   const correctPassword = '1234';
 
@@ -43,6 +45,7 @@ export default function CajeroAutomatico() {
       setBilletesEntregados(nuevosBilletes);
       setMessage(`Has retirado $${withdrawAmount}`);
       setIsModalOpen(true);
+      document.querySelector('audio').play();
     }
     setAmount('');
     setIsWithdrawDisabled(true);
@@ -130,7 +133,7 @@ export default function CajeroAutomatico() {
                   {showPassword ? <EyeOff className="text-gray-400 mb-4" /> : <Eye className="text-gray-400 mb-4" />}
                 </button>
               </div>
-              <button onClick={handleLogin} className="w-full p-2 bg-blue-500 text-white border-none rounded cursor-pointer">
+              <button onClick={handleLogin} className="w-full p-2 bg-blue-500 text-white border-none rounded cursor-pointer hover:bg-blue-700 hover:text-white transition-colors duration-300">
                 Ingresar
               </button>
               {message && (
@@ -139,11 +142,12 @@ export default function CajeroAutomatico() {
             </div>
           ) : (
             <div className="mt-4">
+              <p className="text-xl font-light mb-4">Bienvenido {user}</p>
               <p className="text-lg font-bold mb-4">Saldo: ${balance}</p>
               <label htmlFor="amount" className="block mb-2 text-gray-400">Cantidad</label>
               <input
                 id="amount"
-                type="text" // Cambiado a 'text' para evitar la entrada de 'e'
+                type="text" 
                 value={amount}
                 onChange={validateAmount}
                 placeholder="Ingrese la cantidad"
@@ -153,20 +157,25 @@ export default function CajeroAutomatico() {
                 <p className="text-red-500 mt-2">{message}</p>
               )}
               <div className="flex gap-2 mb-4">
-                <button onClick={handleWithdraw} className="flex-1 p-2 bg-red-500 text-white border-none rounded cursor-pointer" disabled={isWithdrawDisabled}>
+                <button onClick={handleWithdraw} className="flex-1 p-2 bg-red-500 text-white border-none rounded cursor-pointer hover:bg-red-700 hover:text-white transition-colors duration-300" disabled={isWithdrawDisabled}>
                   Retirar
                 </button>
-                <button onClick={handleDeposit} className="flex-1 p-2 bg-green-500 text-white border-none rounded cursor-pointer">
+                <CajeroAudio play={playAudio} />
+                <button onClick={handleDeposit} className="flex-1 p-2 bg-green-600 text-white border-none rounded cursor-pointer hover:bg-green-700 hover:text-white transition-colors duration-300">
                   Abonar
                 </button>
               </div>
-              <button onClick={handleLogout} className="w-full p-2 bg-transparent text-gray-400 border border-gray-600 rounded cursor-pointer">
-                Salir
-              </button>
+                <button
+                  onClick={handleLogout}
+                  className="w-full p-2 bg-transparent text-gray-400 border border-gray-600 rounded cursor-pointer hover:bg-gray-600 hover:text-white transition-colors duration-300"
+                >
+                  Salir
+                </button>
             </div>
           )}
         </div>
       </div>
+      <CajeroAudio />
       <ResultadoModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
