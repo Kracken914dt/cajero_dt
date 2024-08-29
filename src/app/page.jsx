@@ -5,6 +5,8 @@ import ResultadoModal from '@/components/ModalRetiro';
 import { mostrarMatriz, calcularBilletes } from '@/components/logicaBilletes';
 import { Eye, EyeOff } from 'react-feather';
 import CajeroAudio from '@/components/CajeroAudio';
+import HistorialTransaccionesModal from '@/components/HistorialTransaccionesModal';
+
 
 export default function CajeroAutomatico() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -259,25 +261,14 @@ export default function CajeroAutomatico() {
                   Salir
                 </button>
               </div>
-              {showTransactionHistory && (
-                <div className="mt-4 bg-gray-700 p-3 rounded-lg">
-                  <h3 className="text-lg font-bold mb-2">Historial de Transacciones</h3>
-                  {transactionHistory.length === 0 ? (
-                    <p>No hay transacciones registradas.</p>
-                  ) : (
-                    <ul>
-                      {transactionHistory.map((transaction, index) => (
-                        <li key={index} className="mb-2">
-                          {transaction.date}: {transaction.type} de ${transaction.amount}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              )}
             </div>
           )}
         </div>
+        <HistorialTransaccionesModal
+          isOpen={showTransactionHistory}
+          onClose={() => setShowTransactionHistory(false)}
+          transactionHistory={transactionHistory}
+        />
         {isModalOpen && (
           <ResultadoModal
             isOpen={isModalOpen}

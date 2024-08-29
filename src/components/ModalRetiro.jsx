@@ -1,4 +1,4 @@
-// Modificación del ResultadoModal
+
 import React from 'react';
 
 export default function ResultadoModal({
@@ -7,7 +7,7 @@ export default function ResultadoModal({
   billetesEntregados,
   bankName,
   userAccount,
-  tipoOperacion, // Recibe el tipo de operación: "Retiro" o "Abono"
+  tipoOperacion, 
 }) {
   if (!isOpen) return null;
 
