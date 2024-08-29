@@ -1,80 +1,82 @@
-import Image from 'next/image';
-import React, { useState } from 'react';
+// Modificación del ResultadoModal
+import React from 'react';
 
-export default function ResultadoModal({ isOpen, onClose, billetesEntregados, matriz }) {
-  const [showDetails, setShowDetails] = useState(false);
-
+export default function ResultadoModal({
+  isOpen,
+  onClose,
+  billetesEntregados,
+  bankName,
+  userAccount,
+  tipoOperacion, // Recibe el tipo de operación: "Retiro" o "Abono"
+}) {
   if (!isOpen) return null;
 
-
-  const cantidadBilletes = billetesEntregados.reduce((acc, billete) => {
-    acc[billete.billete] = (acc[billete.billete] || 0) + 1;
+  // Agrupar los billetes por denominación y contar la cantidad de cada uno
+  const billetesAgrupados = billetesEntregados.reduce((acc, billete) => {
+    if (!acc[billete.valor]) {
+      acc[billete.valor] = {
+        valor: billete.valor,
+        cantidad: 0,
+        nombre: billete.nombre,
+      };
+    }
+    acc[billete.valor].cantidad += 1;
     return acc;
   }, {});
 
-  const totalEntregado = billetesEntregados.reduce((acc, billete) => acc + billete.valor, 0);
+  // Convertir el objeto de billetes agrupados en un array para mostrarlo en el modal
+  const billetesAgrupadosArray = Object.values(billetesAgrupados);
 
-  const matrizModificada = (totalEntregado === 610000 || totalEntregado === 6100000)
-  ? (totalEntregado === 6100000
-      ? matriz.filter((_, index) => (index + 1) % 5 !== 0) 
-      : matriz.filter((_, index) => index !== 4) 
-    )
-  : matriz;
-  
+  // Calcular el total entregado sumando los valores de los billetes multiplicados por sus cantidades
+  const totalEntregado = billetesAgrupadosArray.reduce(
+    (acc, billete) => acc + billete.valor * billete.cantidad,
+    0
+  );
+
+  // Obtener la fecha y hora actuales separadas
+  const fecha = new Date().toLocaleDateString();
+  const hora = new Date().toLocaleTimeString();
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000080]">
-      <div className="bg-gray-900 text-white p-8 rounded-lg shadow-lg max-w-3xl w-full max-h-[80vh] overflow-auto relative">
-        <button onClick={onClose} className="absolute top-2 right-2 text-gray-400 text-2xl">
-          ×
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white p-4 rounded-md shadow-lg w-80">
+        <h2 className="text-xl font-semibold mb-4 text-black">
+          Recibo de {bankName}
+        </h2>
+        <p className="text-sm mb-2 text-black">
+          <strong>Banco:</strong> {bankName}
+        </p>
+        <p className="text-sm mb-2 text-black">
+          <strong>Número de Cuenta:</strong> {userAccount}
+        </p>
+        <p className="text-sm mb-2 text-black">
+          <strong>Tipo de Operacion:</strong> {tipoOperacion}
+        </p>
+        <p className="text-sm mb-2 text-black">
+          <strong>Fecha:</strong> {fecha}
+        </p>
+        <p className="text-sm mb-2 text-black">
+          <strong>Hora:</strong> {hora}
+        </p>
+        <p className="text-sm mb-2 text-black">
+          <strong>Billetes Entregados:</strong>
+        </p>
+        <ul className="text-sm mb-4 text-black">
+          {billetesAgrupadosArray.map((billete, index) => (
+            <li key={index}>
+              {billete.cantidad} de ${billete.valor}
+            </li>
+          ))}
+        </ul>
+        <p className="text-sm mb-2 text-black">
+          <strong>Total Entregado:</strong> ${totalEntregado}
+        </p>
+        <button
+          className="bg-red-500 text-white p-2 rounded w-full mt-2"
+          onClick={onClose}
+        >
+          Cerrar
         </button>
-        <h3 className="text-2xl font-semibold mb-6">Resultados del Retiro</h3>
-        <div>
-          <h4 className="text-xl font-medium mb-4">Billetes entregados:</h4>
-          <ul className="flex flex-wrap gap-4 overflow-auto max-h-64">
-            {billetesEntregados.map((billete, index) => (
-              <li key={index} className="flex flex-col items-center">
-                <Image src={billete.img} className="w-52 h-auto" alt={`Billete de ${billete.billete}`} />
-              </li>
-            ))}
-          </ul>
-
-          <div className="flex items-center justify-between mt-8">
-            <div>
-              <h4 className="text-xl font-medium">Total entregado:</h4>
-              <div className="text-lg font-mono">${totalEntregado.toLocaleString()}</div>
-            </div>
-            <button
-              onClick={() => setShowDetails(!showDetails)}
-              className="p-2 bg-blue-500 text-white rounded"
-            >
-              {showDetails ? 'Ocultar detalles' : 'Más detalles'}
-            </button>
-          </div>
-
-          {showDetails && (
-            <div className="mt-4 grid grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-xl font-medium">Cantidad de cada billete:</h4>
-                {Object.entries(cantidadBilletes).map(([billete, cantidad]) => (
-                  <div key={billete} className="text-lg font-medium">
-                    {billete}: {cantidad}
-                  </div>
-                ))}
-              </div>
-              <div>
-                <h4 className="text-xl font-medium">Matriz:</h4>
-                <div className="mt-4">
-                  <div className="font-medium">10k  20k   50k   100k</div>
-                  {matrizModificada.map((fila, index) => (
-                    <div key={index} className="text-lg font-mono">
-                      {fila.map((n) => n.toString()).join(' | ')}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );
