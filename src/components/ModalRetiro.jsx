@@ -24,16 +24,16 @@ export default function ResultadoModal({
     return acc;
   }, {});
 
-  // Convertir el objeto de billetes agrupados en un array para mostrarlo en el modal
+
   const billetesAgrupadosArray = Object.values(billetesAgrupados);
 
-  // Calcular el total entregado sumando los valores de los billetes multiplicados por sus cantidades
+
   const totalEntregado = billetesAgrupadosArray.reduce(
     (acc, billete) => acc + billete.valor * billete.cantidad,
     0
   );
 
-  // Obtener la fecha y hora actuales separadas
+
   const fecha = new Date().toLocaleDateString();
   const hora = new Date().toLocaleTimeString();
 

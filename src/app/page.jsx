@@ -6,6 +6,7 @@ import { mostrarMatriz, calcularBilletes } from '@/components/logicaBilletes';
 import { Eye, EyeOff } from 'react-feather';
 import CajeroAudio from '@/components/CajeroAudio';
 import HistorialTransaccionesModal from '@/components/HistorialTransaccionesModal';
+import CodigoVerificacionModal from '@/components/CodigoModal'
 
 
 export default function CajeroAutomatico() {
@@ -26,6 +27,7 @@ export default function CajeroAutomatico() {
   const [operationType, setOperationType] = useState('');
   const [transactionHistory, setTransactionHistory] = useState([]);
   const [showTransactionHistory, setShowTransactionHistory] = useState(false);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
 
   const correctPassword = '1234';
 
@@ -51,6 +53,7 @@ export default function CajeroAutomatico() {
       setMatriz(nuevaMatriz);
       setBilletesEntregados(nuevosBilletes);
       setMessage(`Has retirado $${withdrawAmount}`);
+      console.log(withdrawAmount)
       setOperationType('retiro');
       setTransactionHistory((prev) => [
         ...prev,
@@ -102,6 +105,19 @@ export default function CajeroAutomatico() {
       setMessage('La cantidad debe ser redondeada y de 10.000 para arriba');
     }
   };
+
+  const handleWithdrawWithVerification = (withdrawAmount) => {
+    setIsVerificationModalOpen(true);
+  };
+
+  const handleVerificationSuccess = () => {
+    handleWithdraw(Number(amount)); 
+  };
+
+  const handleVerificationFail = () => {
+    handleLogout(); 
+  };
+
 
   const validateUser = (e) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
@@ -204,7 +220,7 @@ export default function CajeroAutomatico() {
                   />
                   <div className="flex gap-2">
                     <button
-                      onClick={() => handleWithdraw(Number(amount))}
+                      onClick={() => handleWithdrawWithVerification(Number(amount))}
                       disabled={isWithdrawDisabled}
                       className="flex-1 p-2 bg-red-500 text-white border-none rounded cursor-pointer hover:bg-red-700 hover:text-white transition-colors duration-300"
                     >
@@ -268,6 +284,12 @@ export default function CajeroAutomatico() {
           isOpen={showTransactionHistory}
           onClose={() => setShowTransactionHistory(false)}
           transactionHistory={transactionHistory}
+        />
+        <CodigoVerificacionModal
+          isOpen={isVerificationModalOpen}
+          onClose={() => setIsVerificationModalOpen(false)}
+          onSuccess={handleVerificationSuccess}
+          onFail={handleVerificationFail}
         />
         {isModalOpen && (
           <ResultadoModal
