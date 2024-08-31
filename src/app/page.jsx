@@ -107,6 +107,7 @@ export default function CajeroAutomatico() {
   };
 
   const handleWithdrawWithVerification = (withdrawAmount) => {
+    setAmount(withdrawAmount);
     setIsVerificationModalOpen(true);
   };
 
@@ -240,7 +241,7 @@ export default function CajeroAutomatico() {
                 {[20000, 100000, 200000, 300000, 600000].map((value) => (
                   <button
                     key={value}
-                    onClick={() => handleWithdraw(value)}
+                    onClick={() => handleWithdrawWithVerification(value)}
                     className="flex-1 p-2 bg-gray-500 text-white border-none rounded cursor-pointer hover:bg-gray-700 hover:text-white transition-colors duration-300"
                   >
                     Retirar ${value}
