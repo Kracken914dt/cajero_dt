@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import ResultadoModal from '@/components/ModalRetiro';
 import { mostrarMatriz, calcularBilletes } from '@/components/logicaBilletes';
 import { Eye, EyeOff } from 'react-feather';
-import CajeroAudio from '@/components/CajeroAudio';
 import HistorialTransaccionesModal from '@/components/HistorialTransaccionesModal';
 import CodigoVerificacionModal from '@/components/CodigoModal'
 
@@ -22,7 +21,6 @@ export default function CajeroAutomatico() {
   const [showPassword, setShowPassword] = useState(false);
   const [isWithdrawDisabled, setIsWithdrawDisabled] = useState(true);
   const [showAmountInput, setShowAmountInput] = useState(false);
-  const [playAudio, setPlayAudio] = useState(false);
   const [bankName, setBankName] = useState('');
   const [operationType, setOperationType] = useState('');
   const [transactionHistory, setTransactionHistory] = useState([]);
@@ -30,8 +28,25 @@ export default function CajeroAutomatico() {
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [loginAttempts, setLoginAttempts] = useState(0); // contador de intentos fallidos
   const [isAccountLocked, setIsAccountLocked] = useState(false); // estado de bloqueo de cuenta
+  const [pass, setPass] = useState(0);
 
   const correctPassword = '1234';
+
+  useEffect(() => {
+    const storedIsAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    const storedUser = localStorage.getItem('user');
+    const storedBankName = localStorage.getItem('bankName');
+    const storedBalance = localStorage.getItem('balance');
+    const savedTransactionHistory = localStorage.getItem('transactionHistory');
+  
+    if (storedIsAuthenticated && storedUser && storedBankName) {
+      setIsAuthenticated(true);
+      setUser(storedUser);
+      setBankName(storedBankName);
+      setBalance(storedBalance ? parseInt(storedBalance, 10) : 2000000);
+      setTransactionHistory(JSON.parse(savedTransactionHistory) || []);
+    }
+  }, []);
 
   const handleLogin = () => {
     if (isAccountLocked) {
@@ -39,13 +54,21 @@ export default function CajeroAutomatico() {
       return;
     }
   
-    if ((user === '03118432456' || user === '13118432456') && password === correctPassword) {
+    if ((user === '3118432456' || user === '13118432456') && password === correctPassword) {
       setIsAuthenticated(true);
       setMessage('Bienvenido al cajero automático');
-      setBankName(user.startsWith('0') ? 'Nequi' : 'Bancolombia Ahorro a la mano');
-      setLoginAttempts(0); 
+      const bank = user.startsWith('3') ? 'Nequi' : 'Bancolombia Ahorro a la mano';
+      setBankName(bank);
+      setLoginAttempts(0);
+  
+      // Guardar en localStorage
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('user', user);
+      localStorage.setItem('balance', balance.toString());
+      localStorage.setItem('bankName', bank);
+      localStorage.setItem('transactionHistory', JSON.stringify(transactionHistory));
     } else {
-      const attemptsLeft = 2 - loginAttempts; 
+      const attemptsLeft = 2 - loginAttempts;
       setLoginAttempts((prev) => prev + 1);
   
       if (loginAttempts + 1 >= 3) {
@@ -58,6 +81,14 @@ export default function CajeroAutomatico() {
   
     setPassword('');
   };
+
+   // Guardar el historial de transacciones y otros datos relevantes al actualizar
+   useEffect(() => {
+    if (isAuthenticated) {
+      localStorage.setItem('transactionHistory', JSON.stringify(transactionHistory));
+      localStorage.setItem('balance', balance.toString());
+    }
+  }, [isAuthenticated, transactionHistory, balance]);
 
 
   const handleWithdraw = (withdrawAmount) => {
@@ -78,7 +109,6 @@ export default function CajeroAutomatico() {
         { type: 'Retiro', amount: withdrawAmount, date: new Date().toLocaleString() },
       ]);
       setIsModalOpen(true);
-      setPlayAudio(true);
     }
     setAmount('');
     setIsWithdrawDisabled(true);
@@ -94,6 +124,7 @@ export default function CajeroAutomatico() {
         ...prev,
         { type: 'Abono', amount: depositAmount, date: new Date().toLocaleString() },
       ]);
+      setPass(depositAmount);
       setIsModalOpen(true);
     } else {
       setMessage('Introduce una cantidad válida para depositar');
@@ -156,7 +187,7 @@ export default function CajeroAutomatico() {
     setShowTransactionHistory(!showTransactionHistory);
   };
 
-  
+
   const isLoginDisabled = user.trim() === '' || password.trim() === '';
 
   const handleLogout = () => {
@@ -171,7 +202,11 @@ export default function CajeroAutomatico() {
     setOperationType('');
     setTransactionHistory([]);
     setShowTransactionHistory(false);
-    setPlayAudio(false);
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('user');
+    localStorage.removeItem('balance');
+    localStorage.removeItem('bankName');
+    localStorage.removeItem('transactionHistory');
   };
 
   return (
@@ -230,7 +265,7 @@ export default function CajeroAutomatico() {
             </div>
           ) : (
             <div className="mt-4">
-              <p className="text-xl font-light mb-4">Bienvenido {bankName}</p>
+              <p className="text-xl font-light mb-4">Bienvenido a {bankName}</p>
               <p className="text-lg font-bold mb-4">Saldo: ${balance}</p>
               {showAmountInput && (
                 <>
@@ -245,7 +280,7 @@ export default function CajeroAutomatico() {
                     placeholder="Ingrese la cantidad"
                     className="w-full p-2 bg-gray-600 text-gray-100 border border-gray-600 rounded mb-4"
                   />
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 py-2">
                     <button
                       onClick={() => handleWithdrawWithVerification(Number(amount))}
                       disabled={isWithdrawDisabled}
@@ -328,9 +363,9 @@ export default function CajeroAutomatico() {
             userAccount={user}
             billetesEntregados={billetesEntregados}
             tipoOperacion={operationType} 
+            cantidadIntroducida = {pass}
           />
         )}
-        {playAudio && <CajeroAudio />}
       </div>
     </div>
   );

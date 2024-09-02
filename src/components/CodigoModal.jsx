@@ -6,6 +6,7 @@ function CodigoVerificacionModal({ isOpen, onClose, onSuccess, onFail, bankName 
   const [intentosRestantes, setIntentosRestantes] = useState(3);
   const [mensajeError, setMensajeError] = useState('');
   const [tiempoRestante, setTiempoRestante] = useState(2 * 60); // 2 minutos en segundos
+  const [playAudio, setPlayAudio] = useState(false);
 
   useEffect(() => {
     let timer;
@@ -28,12 +29,20 @@ function CodigoVerificacionModal({ isOpen, onClose, onSuccess, onFail, bankName 
     return () => clearInterval(timer);
   }, [isOpen]);
 
+  useEffect(() => {
+    if (playAudio) {
+      // Reproduce el audio cuando playAudio es true
+      const audio = new Audio('/songs/cajero.mp3'); // Asegúrate de tener la ruta correcta al sonido del cajero
+      audio.play();
+      // Detenemos la reproducción después de un tiempo si es necesario
+      audio.onended = () => setPlayAudio(false);
+    }
+  }, [playAudio]);
+
   const generarNuevoCodigo = () => {
-    // Si el usuario es de Bancolombia, usa un código fijo
     if (bankName === 'Bancolombia Ahorro a la mano') {
       setCodigoGenerado('1234');
     } else {
-      // Usa un código aleatorio de 6 dígitos para otros bancos
       const nuevoCodigo = Math.floor(100000 + Math.random() * 900000).toString();
       setCodigoGenerado(nuevoCodigo);
     }
@@ -45,13 +54,14 @@ function CodigoVerificacionModal({ isOpen, onClose, onSuccess, onFail, bankName 
 
   const handleCodigoChange = (e) => {
     const { value } = e.target;
-    if (/^\d*$/.test(value)) { // Expresión regular para permitir solo números
+    if (/^\d*$/.test(value)) {
       setCodigo(value);
     }
   };
 
   const handleSubmit = () => {
     if (codigo === codigoGenerado) {
+      setPlayAudio(true); // Activa la reproducción del sonido
       onSuccess();
       onClose();
     } else {
@@ -75,8 +85,12 @@ function CodigoVerificacionModal({ isOpen, onClose, onSuccess, onFail, bankName 
       <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
         <div className="bg-gray-800 text-white p-5 rounded-lg">
           <h2 className="text-2xl mb-4">Introduce el código de verificación</h2>
-          <p className="mb-4 text-lg">Tu código: <span className="font-bold">{codigoGenerado}</span></p>
-          <p className="mb-4 text-lg">Tiempo restante: <span className="font-bold">{formatoTiempo(tiempoRestante)}</span></p>
+          <p className="mb-4 text-lg">
+            Tu código: <span className="font-bold">{codigoGenerado}</span>
+          </p>
+          <p className="mb-4 text-lg">
+            Tiempo restante: <span className="font-bold">{formatoTiempo(tiempoRestante)}</span>
+          </p>
           <input
             type="text"
             value={codigo}

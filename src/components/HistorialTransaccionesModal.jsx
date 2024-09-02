@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 const HistorialTransaccionesModal = ({ isOpen, onClose, transactionHistory }) => {
@@ -11,16 +10,18 @@ const HistorialTransaccionesModal = ({ isOpen, onClose, transactionHistory }) =>
         {transactionHistory.length === 0 ? (
           <p>No hay transacciones registradas.</p>
         ) : (
-          <ul className="space-y-2">
-            {transactionHistory.map((transaction, index) => (
-              <li key={index} className="border-b border-gray-700 pb-2">
-                <span className="block">{transaction.date}</span>
-                <span className="block">
-                  {transaction.type} de ${transaction.amount}
-                </span>
-              </li>
-            ))}
-          </ul>
+          <div className="max-h-60 overflow-y-auto"> 
+            <ul className="space-y-2">
+              {transactionHistory.map((transaction, index) => (
+                <li key={index} className="border-b border-gray-700 pb-2">
+                  <span className="block">{transaction.date}</span>
+                  <span className="block">
+                    {transaction.type} de ${transaction.amount}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
         <button
           onClick={onClose}
