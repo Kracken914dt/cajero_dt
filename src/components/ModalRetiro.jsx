@@ -26,6 +26,9 @@ export default function ResultadoModal({
 
   const billetesAgrupadosArray = Object.values(billetesAgrupados);
 
+  const cuentaN =
+  bankName === 'Nequi' ? `0${userAccount}` : userAccount;
+
   // Calcular el total entregado
   const totalEntregado = billetesAgrupadosArray.reduce(
     (acc, billete) => acc + billete.valor * billete.cantidad,
@@ -45,7 +48,7 @@ export default function ResultadoModal({
           <strong>Banco:</strong> {bankName}
         </p>
         <p className="text-sm mb-2 text-black">
-          <strong>Número de Cuenta:</strong> {userAccount}
+          <strong>Número de Cuenta: </strong> {cuentaN}
         </p>
         <p className="text-sm mb-2 text-black">
           <strong>Tipo de Operación:</strong> {tipoOperacion}

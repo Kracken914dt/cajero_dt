@@ -14,12 +14,17 @@ function CodigoVerificacionModal({ isOpen, onClose, onSuccess, onFail, bankName 
     if (isOpen) {
       generarNuevoCodigo();
 
-      // Configura el temporizador de 2 minutos para regenerar el código
       timer = setInterval(() => {
         setTiempoRestante((prevTiempo) => {
           if (prevTiempo <= 1) {
-            generarNuevoCodigo();
-            return 2 * 60; // Reinicia el temporizador
+            clearInterval(timer);
+            if (bankName === 'Bancolombia Ahorro a la mano') {
+              onFail();
+              onClose();
+            } else {
+              generarNuevoCodigo(); // Regenera el código para otros bancos
+            }
+            return 2 * 60; 
           }
           return prevTiempo - 1;
         });
@@ -31,10 +36,8 @@ function CodigoVerificacionModal({ isOpen, onClose, onSuccess, onFail, bankName 
 
   useEffect(() => {
     if (playAudio) {
-      // Reproduce el audio cuando playAudio es true
-      const audio = new Audio('/songs/cajero.mp3'); // Asegúrate de tener la ruta correcta al sonido del cajero
+      const audio = new Audio('/songs/cajero.mp3'); 
       audio.play();
-      // Detenemos la reproducción después de un tiempo si es necesario
       audio.onended = () => setPlayAudio(false);
     }
   }, [playAudio]);
@@ -61,7 +64,7 @@ function CodigoVerificacionModal({ isOpen, onClose, onSuccess, onFail, bankName 
 
   const handleSubmit = () => {
     if (codigo === codigoGenerado) {
-      setPlayAudio(true); // Activa la reproducción del sonido
+      setPlayAudio(true); 
       onSuccess();
       onClose();
     } else {
@@ -95,7 +98,7 @@ function CodigoVerificacionModal({ isOpen, onClose, onSuccess, onFail, bankName 
             type="text"
             value={codigo}
             onChange={handleCodigoChange}
-            placeholder="Código de 6 dígitos"
+            placeholder="Ingrese el Código"
             className="w-full p-2 mb-4 bg-gray-700 text-white border border-gray-600 rounded"
             maxLength={6}
           />
