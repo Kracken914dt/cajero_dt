@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
-function CodigoVerificacionModal({ isOpen, onClose, onSuccess, onFail }) {
+function CodigoVerificacionModal({ isOpen, onClose, onSuccess, onFail, bankName }) {
   const [codigo, setCodigo] = useState('');
   const [codigoGenerado, setCodigoGenerado] = useState('');
   const [intentosRestantes, setIntentosRestantes] = useState(3);
   const [mensajeError, setMensajeError] = useState('');
-  const [tiempoRestante, setTiempoRestante] = useState(5 * 60); // 5 minutos en segundos
+  const [tiempoRestante, setTiempoRestante] = useState(2 * 60); // 2 minutos en segundos
 
   useEffect(() => {
     let timer;
@@ -13,12 +13,12 @@ function CodigoVerificacionModal({ isOpen, onClose, onSuccess, onFail }) {
     if (isOpen) {
       generarNuevoCodigo();
 
-      // Configura el temporizador de 5 minutos para regenerar el código
+      // Configura el temporizador de 2 minutos para regenerar el código
       timer = setInterval(() => {
         setTiempoRestante((prevTiempo) => {
           if (prevTiempo <= 1) {
             generarNuevoCodigo();
-            return 5 * 60; // Reinicia el temporizador
+            return 2 * 60; // Reinicia el temporizador
           }
           return prevTiempo - 1;
         });
@@ -29,12 +29,18 @@ function CodigoVerificacionModal({ isOpen, onClose, onSuccess, onFail }) {
   }, [isOpen]);
 
   const generarNuevoCodigo = () => {
-    const nuevoCodigo = Math.floor(100000 + Math.random() * 900000).toString();
-    setCodigoGenerado(nuevoCodigo);
+    // Si el usuario es de Bancolombia, usa un código fijo
+    if (bankName === 'Bancolombia Ahorro a la mano') {
+      setCodigoGenerado('1234');
+    } else {
+      // Usa un código aleatorio de 6 dígitos para otros bancos
+      const nuevoCodigo = Math.floor(100000 + Math.random() * 900000).toString();
+      setCodigoGenerado(nuevoCodigo);
+    }
     setIntentosRestantes(3);
     setCodigo('');
     setMensajeError('');
-    setTiempoRestante(5 * 60); // Reinicia el temporizador
+    setTiempoRestante(2 * 60); // Reinicia el temporizador
   };
 
   const handleCodigoChange = (e) => {

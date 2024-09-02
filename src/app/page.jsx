@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ResultadoModal from '@/components/ModalRetiro';
 import { mostrarMatriz, calcularBilletes } from '@/components/logicaBilletes';
 import { Eye, EyeOff } from 'react-feather';
@@ -28,19 +28,37 @@ export default function CajeroAutomatico() {
   const [transactionHistory, setTransactionHistory] = useState([]);
   const [showTransactionHistory, setShowTransactionHistory] = useState(false);
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
+  const [loginAttempts, setLoginAttempts] = useState(0); // contador de intentos fallidos
+  const [isAccountLocked, setIsAccountLocked] = useState(false); // estado de bloqueo de cuenta
 
   const correctPassword = '1234';
 
   const handleLogin = () => {
+    if (isAccountLocked) {
+      setMessage('Cuenta bloqueada.');
+      return;
+    }
+  
     if ((user === '03118432456' || user === '13118432456') && password === correctPassword) {
       setIsAuthenticated(true);
       setMessage('Bienvenido al cajero automático');
       setBankName(user.startsWith('0') ? 'Nequi' : 'Bancolombia Ahorro a la mano');
+      setLoginAttempts(0); 
     } else {
-      setMessage('Número de cuenta o contraseña incorrecta');
+      const attemptsLeft = 2 - loginAttempts; 
+      setLoginAttempts((prev) => prev + 1);
+  
+      if (loginAttempts + 1 >= 3) {
+        setIsAccountLocked(true);
+        setMessage('Cuenta bloqueada.');
+      } else {
+        setMessage(`Número de cuenta o contraseña incorrecta. Intentos restantes: ${attemptsLeft}`);
+      }
     }
+  
     setPassword('');
   };
+
 
   const handleWithdraw = (withdrawAmount) => {
     if (withdrawAmount > balance) {
@@ -138,6 +156,9 @@ export default function CajeroAutomatico() {
     setShowTransactionHistory(!showTransactionHistory);
   };
 
+  
+  const isLoginDisabled = user.trim() === '' || password.trim() === '';
+
   const handleLogout = () => {
     setIsAuthenticated(false);
     setBalance(2000000);
@@ -196,7 +217,12 @@ export default function CajeroAutomatico() {
               </div>
               <button
                 onClick={handleLogin}
-                className="w-full p-2 bg-blue-500 text-white border-none rounded cursor-pointer hover:bg-blue-700 hover:text-white transition-colors duration-300"
+                disabled={isLoginDisabled}
+                className={`w-full p-2 border-none rounded cursor-pointer transition-colors duration-300 ${
+                  isLoginDisabled
+                    ? 'bg-gray-500 cursor-not-allowed'
+                    : 'bg-blue-500 hover:bg-blue-700 text-white'
+                }`}
               >
                 Ingresar
               </button>
@@ -291,6 +317,7 @@ export default function CajeroAutomatico() {
           onClose={() => setIsVerificationModalOpen(false)}
           onSuccess={handleVerificationSuccess}
           onFail={handleVerificationFail}
+          bankName={bankName} 
         />
         {isModalOpen && (
           <ResultadoModal
