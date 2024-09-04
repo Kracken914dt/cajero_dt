@@ -5,7 +5,7 @@ function CodigoVerificacionModal({ isOpen, onClose, onSuccess, onFail, bankName 
   const [codigoGenerado, setCodigoGenerado] = useState('');
   const [intentosRestantes, setIntentosRestantes] = useState(3);
   const [mensajeError, setMensajeError] = useState('');
-  const [tiempoRestante, setTiempoRestante] = useState(2 * 60); // 2 minutos en segundos
+  const [tiempoRestante, setTiempoRestante] = useState(2 * 60); 
   const [playAudio, setPlayAudio] = useState(false);
 
   useEffect(() => {
@@ -14,25 +14,22 @@ function CodigoVerificacionModal({ isOpen, onClose, onSuccess, onFail, bankName 
     if (isOpen) {
       generarNuevoCodigo();
 
-      timer = setInterval(() => {
-        setTiempoRestante((prevTiempo) => {
-          if (prevTiempo <= 1) {
-            clearInterval(timer);
-            if (bankName === 'Bancolombia Ahorro a la mano') {
-              onFail();
-              onClose();
-            } else {
-              generarNuevoCodigo(); // Regenera el código para otros bancos
+      if (bankName !== 'Bancolombia Ahorro a la mano') {
+        timer = setInterval(() => {
+          setTiempoRestante((prevTiempo) => {
+            if (prevTiempo <= 1) {
+              clearInterval(timer);
+              generarNuevoCodigo(); 
+              return 2 * 60; 
             }
-            return 2 * 60; 
-          }
-          return prevTiempo - 1;
-        });
-      }, 1000);
+            return prevTiempo - 1;
+          });
+        }, 1000);
+      }
     }
 
     return () => clearInterval(timer);
-  }, [isOpen]);
+  }, [isOpen, bankName]);
 
   useEffect(() => {
     if (playAudio) {
@@ -52,7 +49,7 @@ function CodigoVerificacionModal({ isOpen, onClose, onSuccess, onFail, bankName 
     setIntentosRestantes(3);
     setCodigo('');
     setMensajeError('');
-    setTiempoRestante(2 * 60); // Reinicia el temporizador
+    setTiempoRestante(2 * 60); 
   };
 
   const handleCodigoChange = (e) => {
@@ -91,9 +88,11 @@ function CodigoVerificacionModal({ isOpen, onClose, onSuccess, onFail, bankName 
           <p className="mb-4 text-lg">
             Tu código: <span className="font-bold">{codigoGenerado}</span>
           </p>
-          <p className="mb-4 text-lg">
-            Tiempo restante: <span className="font-bold">{formatoTiempo(tiempoRestante)}</span>
-          </p>
+          {bankName !== 'Bancolombia Ahorro a la mano' && (
+            <p className="mb-4 text-lg">
+              Tiempo restante: <span className="font-bold">{formatoTiempo(tiempoRestante)}</span>
+            </p>
+          )}
           <input
             type="text"
             value={codigo}
