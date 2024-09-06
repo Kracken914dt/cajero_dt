@@ -172,12 +172,18 @@ export default function CajeroAutomatico() {
 
 
   const validateUser = (e) => {
-    const value = e.target.value.replace(/[^0-9]/g, '');
+    let value = e.target.value.replace(/[^0-9]/g, '');
+    if (value.length > 11) {
+      value = value.slice(0, 11); 
+    }
     setUser(value);
   };
 
   const validatePassword = (e) => {
-    const value = e.target.value.replace(/[^0-9]/g, '');
+    let value = e.target.value.replace(/[^0-9]/g, '');
+    if (value.length > 6) {
+      value = value.slice(0, 6); 
+    }
     setPassword(value);
   };
 

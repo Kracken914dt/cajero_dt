@@ -85,9 +85,11 @@ function CodigoVerificacionModal({ isOpen, onClose, onSuccess, onFail, bankName 
       <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
         <div className="bg-gray-800 text-white p-5 rounded-lg">
           <h2 className="text-2xl mb-4">Introduce el código de verificación</h2>
-          <p className="mb-4 text-lg">
-            Tu código: <span className="font-bold">{codigoGenerado}</span>
-          </p>
+            {bankName !== 'Bancolombia Ahorro a la mano' && (
+              <p className="mb-4 text-lg">
+                Tu código: <span className="font-bold">{codigoGenerado}</span>
+              </p>
+            )}
           {bankName !== 'Bancolombia Ahorro a la mano' && (
             <p className="mb-4 text-lg">
               Tiempo restante: <span className="font-bold">{formatoTiempo(tiempoRestante)}</span>
