@@ -7,11 +7,11 @@ export default function ResultadoModal({
   bankName,
   userAccount,
   tipoOperacion,
-  cantidadIntroducida // Asegúrate de pasar esta propiedad cuando uses el componente
+  cantidadIntroducida 
 }) {
   if (!isOpen) return null;
 
-  // Agrupar los billetes por denominación y contar la cantidad de cada uno
+  
   const billetesAgrupados = billetesEntregados.reduce((acc, billete) => {
     if (!acc[billete.valor]) {
       acc[billete.valor] = {
@@ -29,7 +29,7 @@ export default function ResultadoModal({
   const cuentaN =
   bankName === 'Nequi' ? `0${userAccount}` : userAccount;
 
-  // Calcular el total entregado
+  
   const totalEntregado = billetesAgrupadosArray.reduce(
     (acc, billete) => acc + billete.valor * billete.cantidad,
     0
@@ -60,12 +60,10 @@ export default function ResultadoModal({
           <strong>Hora:</strong> {hora}
         </p>
         {tipoOperacion === 'abono' ? (
-          // Mostrar solo el total abonado si es una operación de abono
           <p className="text-sm mb-2 text-black">
             <strong>Total Abonado:</strong> ${cantidadIntroducida}
           </p>
         ) : (
-          // Mostrar los billetes entregados y el total si no es un abono
           <>
             <p className="text-sm mb-2 text-black">
               <strong>Billetes Entregados:</strong>
