@@ -6,7 +6,7 @@ import { mostrarMatriz, calcularBilletes } from '@/components/logicaBilletes';
 import { Eye, EyeOff } from 'react-feather';
 import HistorialTransaccionesModal from '@/components/HistorialTransaccionesModal';
 import CodigoVerificacionModal from '@/components/CodigoModal'
-import { FaHistory, FaSignOutAlt, FaDollarSign, FaHandHoldingUsd } from 'react-icons/fa'; // Iconos para botones
+import { FaHistory, FaSignOutAlt, FaDollarSign, FaHandHoldingUsd } from 'react-icons/fa'; 
 import cajero from "@/assets/images/cajero.png";
 import Image from 'next/image';
 
