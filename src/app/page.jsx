@@ -213,9 +213,11 @@ export default function CajeroAutomatico() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      {!isAuthenticated && (
       <div className="hidden lg:block"> 
       <Image src={cajero} alt="Cajero" className="w-72 h-auto object-cover" />
       </div>
+      )}
       <div className="w-[350px] bg-gray-800 text-gray-100 p-5 rounded-lg shadow-lg">
         <div>
           <h2 className="text-2xl mb-2">Cajero Automático</h2>
